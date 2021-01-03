@@ -1,4 +1,4 @@
-defmodule Absinthe.Phoenix.Controller.Action do
+defmodule AbsintheClient.Controller.Action do
   @moduledoc false
 
   import Plug.Conn
@@ -12,7 +12,7 @@ defmodule Absinthe.Phoenix.Controller.Action do
   def run(bp, opts) do
     case internal?(bp, opts) do
       true ->
-        {:swap, bp, Phase.Document.Result, Absinthe.Phoenix.Controller.Result}
+        {:swap, bp, Phase.Document.Result, AbsintheClient.Controller.Result}
 
       false ->
         {:insert, bp, normal_pipeline(opts)}

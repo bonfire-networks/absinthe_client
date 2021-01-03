@@ -1,6 +1,6 @@
-defmodule Absinthe.Phoenix.ControllerTest do
+defmodule AbsintheClient.ControllerTest do
   use ExUnit.Case, async: true
-  use Absinthe.Phoenix.ConnCase
+  use AbsintheClient.ConnCase
 
   defmodule Schema do
     use Absinthe.Schema
@@ -62,8 +62,8 @@ defmodule Absinthe.Phoenix.ControllerTest do
   defmodule Controller do
     use Phoenix.Controller
 
-    use Absinthe.Phoenix.Controller,
-      schema: Absinthe.Phoenix.ControllerTest.Schema,
+    use AbsintheClient.Controller,
+      schema: AbsintheClient.ControllerTest.Schema,
       action: [mode: :internal]
 
     @graphql """

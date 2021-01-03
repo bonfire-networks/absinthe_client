@@ -1,16 +1,16 @@
-defmodule Absinthe.Phoenix.Controller do
+defmodule AbsintheClient.Controller do
   @moduledoc """
   Supports use of GraphQL documents inside Phoenix controllers.
 
   ## Example
 
-  First, `use Absinthe.Phoenix.Controller`, passing your `schema` and
+  First, `use AbsintheClient.Controller`, passing your `schema` and
   notifying Absinthe to operate in `internal` mode:
 
   ```elixir
   defmodule MyAppWeb.UserController do
     use MyAppWeb, :controller
-    use Absinthe.Phoenix.Controller, schema: MyAppWeb.Schema, action: [mode: :internal]
+    use AbsintheClient.Controller, schema: MyAppWeb.Schema, action: [mode: :internal]
 
     # ... actions
 
@@ -32,7 +32,7 @@ defmodule Absinthe.Phoenix.Controller do
   ```
 
   The params for the action will be intercepted by the
-  `Absinthe.Phoenix.Controller.Action` plug, and used as variables for
+  `AbsintheClient.Controller.Action` plug, and used as variables for
   the GraphQL document you've specified.
 
   For instance, given a definition for a `:user_filter` input object
@@ -276,12 +276,12 @@ defmodule Absinthe.Phoenix.Controller do
     |> Pipeline.from(Phase.Document.Variables)
     |> Pipeline.insert_before(
       Phase.Document.Variables,
-      {Absinthe.Phoenix.Controller.Blueprint, options}
+      {AbsintheClient.Controller.Blueprint, options}
     )
     |> Pipeline.without(Phase.Document.Validation.ScalarLeafs)
     |> Pipeline.insert_after(
       Phase.Document.Directives,
-      {Absinthe.Phoenix.Controller.Action, options}
+      {AbsintheClient.Controller.Action, options}
     )
   end
 

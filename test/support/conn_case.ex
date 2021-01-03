@@ -1,4 +1,4 @@
-defmodule Absinthe.Phoenix.ConnCase do
+defmodule AbsintheClient.ConnCase do
   use ExUnit.CaseTemplate
 
   using do
@@ -6,7 +6,7 @@ defmodule Absinthe.Phoenix.ConnCase do
       import Plug.Conn
       import Phoenix.ConnTest
 
-      @endpoint Absinthe.Phoenix.TestEndpoint
+      @endpoint AbsintheClient.TestEndpoint
     end
   end
 end

@@ -1,8 +1,8 @@
-defmodule Absinthe.Phoenix.TestEndpoint do
-  use Phoenix.Endpoint, otp_app: :absinthe_phoenix
-  use Absinthe.Phoenix.Endpoint
+defmodule AbsintheClient.TestEndpoint do
+  use Phoenix.Endpoint, otp_app: :absinthe_client
+  use AbsintheClient.Endpoint
 
-  socket("/socket", Absinthe.Phoenix.TestSocket)
+  socket("/socket", AbsintheClient.TestSocket)
 
   plug(Plug.RequestId)
   plug(Plug.Logger)

@@ -1,4 +1,4 @@
-defmodule Absinthe.Phoenix.ChannelCase do
+defmodule AbsintheClient.ChannelCase do
   use ExUnit.CaseTemplate
 
   using do
@@ -7,7 +7,7 @@ defmodule Absinthe.Phoenix.ChannelCase do
       import Phoenix.ChannelTest
 
       # The default endpoint for testing
-      @endpoint Absinthe.Phoenix.TestEndpoint
+      @endpoint AbsintheClient.TestEndpoint
     end
   end
 end

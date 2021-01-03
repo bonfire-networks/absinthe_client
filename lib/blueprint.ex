@@ -1,4 +1,4 @@
-defmodule Absinthe.Phoenix.Controller.Blueprint do
+defmodule AbsintheClient.Controller.Blueprint do
   @moduledoc false
 
   # make sure to set values on blueprint

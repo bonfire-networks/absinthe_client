@@ -1,11 +1,11 @@
-defmodule Absinthe.Phoenix.Mixfile do
+defmodule AbsintheClient.Mixfile do
   use Mix.Project
 
   @version "2.0.0"
 
   def project do
     [
-      app: :absinthe_phoenix,
+      app: :absinthe_client,
       version: @version,
       elixir: "~> 1.4",
       elixirc_paths: elixirc_paths(Mix.env()),
@@ -27,8 +27,8 @@ defmodule Absinthe.Phoenix.Mixfile do
       links: %{
         Website: "https://absinthe-graphql.org",
         Changelog:
-          "https://github.com/absinthe-graphql/absinthe_phoenix/blob/master/CHANGELOG.md",
-        GitHub: "https://github.com/absinthe-graphql/absinthe_phoenix"
+          "https://github.com/absinthe-graphql/absinthe_client/blob/master/CHANGELOG.md",
+        GitHub: "https://github.com/absinthe-graphql/absinthe_client"
       }
     ]
   end
@@ -44,7 +44,7 @@ defmodule Absinthe.Phoenix.Mixfile do
     [
       {:absinthe_plug, "~> 1.5.0"},
       {:absinthe, "~> 1.5.0"},
-      {:decimal, "~> 1.0"},
+      {:decimal, "~> 1.6 or ~> 2.0"},
       {:phoenix, "~> 1.5"},
       {:phoenix_pubsub, "~> 2.0"},
       {:phoenix_html, "~> 2.13", optional: true},
