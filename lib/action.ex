@@ -91,7 +91,7 @@ defmodule AbsintheClient.Action do
   end
 
 
-  def execute(conn_or_socket, schema, querying_module, action_name, document, params, config) do
+  def execute(conn_or_socket, schema, querying_module, _action_name, document, params, config) do
     variables = parse_variables(document, params, schema, querying_module)
     config = Map.put(config, :variables, variables)
 
@@ -100,7 +100,7 @@ defmodule AbsintheClient.Action do
       {:ok, %{result: result}, _phases} ->
         conn_or_socket
         |> Helpers.assign(:absinthe_variables, params)
-        |> put_or_assign(action_name, result)
+        |> return_or_put(result)
 
       {:error, msg, _phases} ->
         # IO.inspect(error: msg)
@@ -109,14 +109,13 @@ defmodule AbsintheClient.Action do
     end
   end
 
-  def put_or_assign(%Plug.Conn{} = conn, _, val) do
-    conn
-        |> Map.put(:params, val)
+  def return_or_put(%Phoenix.LiveView.Socket{} = socket, val) do
+    val
   end
 
-  def put_or_assign(%Phoenix.LiveView.Socket{} = socket, key, val) do
-    socket
-    |> Phoenix.LiveView.assign(String.to_existing_atom(key), val)
+  def return_or_put(%Plug.Conn{} = conn, val) do
+    conn
+        |> Map.put(:params, val)
   end
 
   defp document_key(%{assigns: %{phoenix_action: name}}), do: to_string(name)
