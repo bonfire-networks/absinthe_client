@@ -62,34 +62,34 @@ defmodule AbsintheClient.ControllerTest do
   defmodule Controller do
     use Phoenix.Controller
 
-    use AbsintheClient.Controller,
+    use AbsintheClient,
       schema: AbsintheClient.ControllerTest.Schema,
       action: [mode: :internal]
 
     @graphql """
     query ($echo: String) { string(echo: $echo) }
     """
-    def string(conn, %{data: data}), do: json(conn, data)
+    def string(conn_or_socket, %{data: data}), do: json(conn_or_socket, data)
 
     @graphql {"""
               query ($echo: String) { string(echo: $echo) }
               """, ReverseSchema}
-    def reverse_string(conn, %{data: data}), do: json(conn, data)
+    def reverse_string(conn_or_socket, %{data: data}), do: json(conn_or_socket, data)
 
     @graphql """
     query ($echo: Int) { integer(echo: $echo) }
     """
-    def integer(conn, %{data: data}), do: json(conn, data)
+    def integer(conn_or_socket, %{data: data}), do: json(conn_or_socket, data)
 
     @graphql """
     query ($echo: [Int]) { list_of_integers(echo: $echo) }
     """
-    def list_of_integers(conn, %{data: data}), do: json(conn, data)
+    def list_of_integers(conn_or_socket, %{data: data}), do: json(conn_or_socket, data)
 
     @graphql """
     query ($echo: DeepIntegersInput) { input_object_with_integers(echo: $echo) }
     """
-    def input_object_with_integers(conn, %{data: data}), do: json(conn, data)
+    def input_object_with_integers(conn_or_socket, %{data: data}), do: json(conn_or_socket, data)
   end
 
   describe "input" do
@@ -121,9 +121,9 @@ defmodule AbsintheClient.ControllerTest do
   end
 
   def result(controller, name, params, verb \\ :get) do
-    conn = build_conn(verb, "/", params) |> Plug.Conn.fetch_query_params()
+    conn_or_socket = build_conn(verb, "/", params) |> Plug.Conn.fetch_query_params()
 
-    controller.call(conn, controller.init(name))
+    controller.call(conn_or_socket, controller.init(name))
     |> json_response(200)
   end
 end

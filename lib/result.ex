@@ -1,4 +1,4 @@
-defmodule AbsintheClient.Controller.Result do
+defmodule AbsintheClient.Result do
   @moduledoc false
 
   # Produces data fit for external encoding from annotated value tree

@@ -1,16 +1,16 @@
-defmodule AbsintheClient.Controller do
+defmodule AbsintheClient do
   @moduledoc """
-  Supports use of GraphQL documents inside Phoenix controllers.
+  Supports use of GraphQL documents from with app containing the Absinthe schema
 
   ## Example
 
-  First, `use AbsintheClient.Controller`, passing your `schema` and
+  First, `use AbsintheClient`, passing your `schema` and
   notifying Absinthe to operate in `internal` mode:
 
   ```elixir
   defmodule MyAppWeb.UserController do
     use MyAppWeb, :controller
-    use AbsintheClient.Controller, schema: MyAppWeb.Schema, action: [mode: :internal]
+    use AbsintheClient, schema: MyAppWeb.Schema, action: [mode: :internal]
 
     # ... actions
 
@@ -26,13 +26,13 @@ defmodule AbsintheClient.Controller do
       users(filter: $filter, limit: 10)
     }
   \"""
-  def index(conn, %{data: data}) do
-    render conn, "index.html", data
+  def index(conn_or_socket, %{data: data}) do
+    render conn_or_socket, "index.html", data
   end
   ```
 
   The params for the action will be intercepted by the
-  `AbsintheClient.Controller.Action` plug, and used as variables for
+  `AbsintheClient.Action` plug, and used as variables for
   the GraphQL document you've specified.
 
   For instance, given a definition for a `:user_filter` input object
@@ -61,7 +61,7 @@ defmodule AbsintheClient.Controller do
 
   (For how the string `"42"` was converted into `42`, see `cast_param/3`).
 
-  The params on the `conn` will then be replaced by the result of the
+  The params on the `conn_or_socket` will then be replaced by the result of the
   execution by Absinthe. The action function can then match against
   that result to respond correctly to the user:
 
@@ -81,8 +81,8 @@ defmodule AbsintheClient.Controller do
   processed in an HTTP API and the GraphQL documents that this module
   supports.
 
-  In an effort to make use of GraphQL ergonomic in Phoenix controllers
-  and views, Absinthe supports some slight structural modifications to
+  In an effort to make use of GraphQL ergonomic in Elixir,
+  Absinthe supports some slight structural modifications to
   the GraphQL documents provided using the `@graphql` module attribute
   in controller modules.
 
@@ -114,7 +114,7 @@ defmodule AbsintheClient.Controller do
   ```
   <ul>
     <%= for user <- @users do %>
-      <li><%= link user.full_name, to: user_path(@conn, :show, user) %></li>
+      <li><%= link user.full_name, to: user_path(@conn_or_socket, :show, user) %></li>
     <% end %>
   </ul>
   ```
@@ -263,8 +263,8 @@ defmodule AbsintheClient.Controller do
     end
   end
 
-  def variables(conn) do
-    conn.private[:absinthe_variables]
+  def variables(conn_or_socket) do
+    conn_or_socket.assigns[:absinthe_variables]
   end
 
   def default_pipeline(schema, options) do
@@ -276,12 +276,12 @@ defmodule AbsintheClient.Controller do
     |> Pipeline.from(Phase.Document.Variables)
     |> Pipeline.insert_before(
       Phase.Document.Variables,
-      {AbsintheClient.Controller.Blueprint, options}
+      {AbsintheClient.Blueprint, options}
     )
     |> Pipeline.without(Phase.Document.Validation.ScalarLeafs)
     |> Pipeline.insert_after(
       Phase.Document.Directives,
-      {AbsintheClient.Controller.Action, options}
+      {AbsintheClient.Action, options}
     )
   end
 

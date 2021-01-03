@@ -1,7 +1,5 @@
-defmodule AbsintheClient.Controller.Action do
+defmodule AbsintheClient.Action do
   @moduledoc false
-
-  import Plug.Conn
 
   @behaviour Plug
   @behaviour Absinthe.Phase
@@ -12,14 +10,14 @@ defmodule AbsintheClient.Controller.Action do
   def run(bp, opts) do
     case internal?(bp, opts) do
       true ->
-        {:swap, bp, Phase.Document.Result, AbsintheClient.Controller.Result}
+        {:swap, bp, Phase.Document.Result, AbsintheClient.Result}
 
       false ->
         {:insert, bp, normal_pipeline(opts)}
     end
   end
 
-  # Refactor this offense to code
+  # TODO: Refactor
   defp internal?(bp, opts) do
     opts[:action][:mode] == :internal ||
       with %{flags: flags} <- Blueprint.current_operation(bp) do
@@ -43,30 +41,30 @@ defmodule AbsintheClient.Controller.Action do
   end
 
   @impl Plug
-  def call(conn, config) do
-    controller = conn.private.phoenix_controller
+  def call(conn_or_socket, config) do
+    controller = conn_or_socket.private.phoenix_controller
     document_provider = Module.safe_concat(controller, GraphQL)
-    config = update_config(conn, config)
+    config = update_config(conn_or_socket, config)
 
-    case document_and_schema(conn, document_provider) do
+    case document_and_schema(conn_or_socket, document_provider) do
       {document, schema} when not is_nil(document) and not is_nil(schema) ->
-        execute(conn, schema, controller, document, config)
+        execute(conn_or_socket, schema, controller, document, config)
 
       _ ->
-        conn
+        conn_or_socket
     end
   end
 
-  defp update_config(conn, config) do
+  defp update_config(conn_or_socket, config) do
     root_value =
       config
       |> Map.get(:root_value, %{})
-      |> Map.merge(conn.private[:absinthe][:root_value] || %{})
+      |> Map.merge(conn_or_socket.private[:absinthe][:root_value] || %{})
 
     context =
       config
       |> Map.get(:context, %{})
-      |> Map.merge(extract_context(conn))
+      |> Map.merge(extract_context(conn_or_socket))
 
     Map.merge(config, %{
       context: context,
@@ -74,43 +72,34 @@ defmodule AbsintheClient.Controller.Action do
     })
   end
 
-  defp extract_context(conn) do
-    conn.private[:absinthe][:context] || %{}
+  defp extract_context(conn_or_socket) do
+    conn_or_socket.private[:absinthe][:context] || %{}
   end
 
-  @spec execute(
-          conn :: Plug.Conn.t(),
-          schema :: Absinthe.Schema.t(),
-          controller :: module,
-          document :: Absinthe.Blueprint.t(),
-          Keyword.t()
-        ) :: Plug.Conn.t()
-  defp execute(conn, schema, controller, document, config) do
-    variables = parse_variables(document, conn.params, schema, controller)
+
+  defp execute(conn_or_socket, schema, controller, document, config) do
+    variables = parse_variables(document, conn_or_socket.params, schema, controller)
     config = Map.put(config, :variables, variables)
 
     case Absinthe.Pipeline.run(document, pipeline(schema, controller, config)) do
+
       {:ok, %{result: result}, _phases} ->
-        conn
-        |> Plug.Conn.put_private(:absinthe_variables, conn.params)
+        conn_or_socket
+        |> assign(:absinthe_variables, conn_or_socket.params)
         |> Map.put(:params, result)
 
       {:error, msg, _phases} ->
-        conn
-        |> send_resp(500, msg)
+        conn_or_socket
+        |> error(msg)
     end
   end
 
-  @spec document_key(conn :: Plug.Conn.t()) :: nil | atom
   defp document_key(%{private: %{phoenix_action: name}}), do: to_string(name)
   defp document_key(_), do: nil
 
-  @spec document_and_schema(
-          conn :: Plug.Conn.t(),
-          document_provider :: Absinthe.Plug.DocumentProvider.Compiled.t()
-        ) :: {nil | Absinthe.Blueprint.t(), nil | Absinthe.Schema.t()}
-  defp document_and_schema(conn, document_provider) do
-    case document_key(conn) do
+
+  defp document_and_schema(conn_or_socket, document_provider) do
+    case document_key(conn_or_socket) do
       nil ->
         {nil, nil}
 
@@ -122,8 +111,6 @@ defmodule AbsintheClient.Controller.Action do
     end
   end
 
-  @spec pipeline(schema :: Absinthe.Schema.t(), controller :: module, Keyword.t()) ::
-          Absinthe.Pipeline.t()
   defp pipeline(schema, controller, config) do
     options = Map.to_list(config)
     controller.absinthe_pipeline(schema, options)
@@ -143,14 +130,30 @@ defmodule AbsintheClient.Controller.Action do
     end
   end
 
+  defp assign(%Plug.Conn{} = conn, key, val) do
+    conn
+    |> Plug.Conn.assign(:absinthe_variables, conn.params)
+  end
+
+  defp assign(%Phoenix.LiveView.Socket{} = socket, key, val) do
+    socket
+    |> Phoenix.LiveView.assign(:absinthe_variables, socket.params)
+  end
+
+  defp error(%Plug.Conn{} = conn, error) do
+    conn |> Plug.Conn.send_resp(500, error)
+  end
+
+  defp error(%Phoenix.LiveView.Socket{} = socket, error) do
+    {:noreply, Phoenix.LiveView.put_flash(socket, :error, error)}
+  end
+
   @type_mapping %{
     Absinthe.Blueprint.TypeReference.List => Absinthe.Type.List,
     Absinthe.Blueprint.TypeReference.NonNull => Absinthe.Type.NonNull
   }
 
   # TODO: Extract this from here & Absinthe.Phase.Schema to a common function
-  @spec type_reference_to_type(Absinthe.Blueprint.TypeReference.t(), Absinthe.Schema.t()) ::
-          Absinthe.Type.t()
   defp type_reference_to_type(%Absinthe.Blueprint.TypeReference.Name{name: name}, schema) do
     Absinthe.Schema.lookup_type(schema, name)
   end
