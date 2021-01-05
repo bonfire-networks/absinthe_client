@@ -50,7 +50,7 @@ defmodule AbsintheClient.Action do
     call(conn_or_socket, querying_module, conn_or_socket.params, config)
   end
 
-  # can run outside of Plug
+  # to be used manually (from AbsintheClient.graphql()), can run outside of Plug
   def call(conn_or_socket, querying_module, params, config) do
     document_provider = Module.safe_concat(querying_module, GraphQL)
     # IO.inspect(document_provider: document_provider)

@@ -186,21 +186,49 @@ defmodule AbsintheClient do
 
       @absinthe_schema unquote(schema)
 
-      # IO.inspect(plugging: unquote(plugging))
+      # if we are running with a Phoenix Controller
       if unquote(plugging) do
         require Plug.Builder
         Plug.Builder.plug(unquote(__MODULE__).Action, unquote(opts))
       end
 
-      def graphql(conn_or_socket, name \\ nil) do
+      # Trigger the GraphQL query manually
+      def graphql(conn_or_socket, name \\ nil, params \\ %{}) do
+
+        # need string keys
+        params = for {key, val} <- params, into: %{} do
+                  {to_string(key), val}
+                 end
 
         unquote(__MODULE__).Action.call(
           conn_or_socket |> AbsintheClient.Helpers.assign(:phoenix_action, name),
           __MODULE__,
-          %{},
+          params,
           %{action: %{mode: :internal}}
         )
       end
+
+      # Trigger meant to be used in LiveView
+      def liveql(socket, name \\ nil, params \\ %{}) do
+        data = case graphql(socket, name, params) do
+          %{data: data, errors: errors} ->
+            IO.inspect(partial_graphql_errors: errors)
+            data
+          %{data: data} -> data
+          %{errors: errors} ->
+            IO.inspect(graphql_errors: errors)
+            nil
+        end
+
+        if data do
+          if Enum.count(data)==1 && Map.get(data, name) do
+            Map.get(data, name)
+          else
+            data
+          end
+        end
+      end
+
 
       @impl unquote(__MODULE__)
       @spec cast_param(
