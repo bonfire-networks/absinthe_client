@@ -201,7 +201,7 @@ defmodule AbsintheClient do
                  end
 
         unquote(__MODULE__).Action.call(
-          conn_or_socket |> AbsintheClient.Helpers.assign(:phoenix_action, name),
+          AbsintheClient.Helpers.assign(conn_or_socket, :phoenix_action, name),
           __MODULE__,
           params,
           %{action: %{mode: :internal}}
