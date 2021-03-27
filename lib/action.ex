@@ -11,18 +11,18 @@ defmodule AbsintheClient.Action do
   def run(bp, opts) do
     case internal?(bp, opts) do
       true ->
-        # IO.inspect(internal: true)
+        #IO.inspect(internal: true)
         {:swap, bp, Phase.Document.Result, AbsintheClient.Result}
 
       false ->
-        # IO.inspect(internal: false)
+        #IO.inspect(internal: false)
         {:insert, bp, normal_pipeline(opts)}
     end
   end
 
   # TODO: Refactor
   defp internal?(bp, opts) do
-    # IO.inspect(internal_opts: opts)
+    #IO.inspect(internal_opts: opts)
     opts[:action][:mode] == :internal ||
       with %{flags: flags} <- Blueprint.current_operation(bp) do
         Map.has_key?(flags, {:action, :internal})
@@ -53,18 +53,18 @@ defmodule AbsintheClient.Action do
   # to be used manually (from AbsintheClient.graphql()), can run outside of Plug
   def call(conn_or_socket, querying_module, params, config) do
     document_provider = Module.safe_concat(querying_module, GraphQL)
-    # IO.inspect(document_provider: document_provider)
+    #IO.inspect(document_provider: document_provider)
     config = update_config(conn_or_socket, config)
-    # IO.inspect(config: config)
+    #IO.inspect(config: config)
 
     case document_and_schema(conn_or_socket, document_provider) do
       {action_name, document, schema} when not is_nil(document) and not is_nil(schema) ->
-        # # IO.inspect(document: document)
-        # IO.inspect(schema: schema)
+        # #IO.inspect(document: document)
+        #IO.inspect(schema: schema)
         execute(conn_or_socket, schema, querying_module, action_name, document, params, config)
 
       _ ->
-        # IO.inspect(document_and_schema: false)
+        #IO.inspect(document_and_schema: false)
         conn_or_socket
     end
   end
@@ -103,7 +103,7 @@ defmodule AbsintheClient.Action do
         |> return_or_put(result)
 
       {:error, msg, _phases} ->
-        # IO.inspect(error: msg)
+        #IO.inspect(error: msg)
         conn_or_socket
         |> Helpers.error(msg)
     end
@@ -122,7 +122,7 @@ defmodule AbsintheClient.Action do
   defp document_key(%{private: %{phoenix_action: name}}), do: to_string(name)
   defp document_key(%{assigns: %{private: %{phoenix_action: name}}}), do: to_string(name)
   defp document_key(p) do
-    # IO.inspect(document_key: p)
+    #IO.inspect(document_key: p)
      nil
   end
   defp document_key(_), do: nil

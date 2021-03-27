@@ -176,7 +176,7 @@ defmodule AbsintheClient do
     plugging = Keyword.get(opts, :plugging)
 
     quote do
-      # # IO.inspect(module: __MODULE__)
+      # #IO.inspect(module: __MODULE__)
 
       @behaviour unquote(__MODULE__)
       @before_compile unquote(__MODULE__)
@@ -332,7 +332,7 @@ defmodule AbsintheClient do
 
   defmacro __before_compile__(env) do
     actions = Module.get_attribute(env.module, :graphql_actions)
-    # IO.inspect(actions: actions)
+    #IO.inspect(actions: actions)
     provides = for {name, doc, _} <- actions, do: {name, doc}
     schemas = for {name, _, schema} <- actions, do: {to_string(name), schema}
 
@@ -344,7 +344,7 @@ defmodule AbsintheClient do
         @absinthe_schemas %{unquote_splicing(schemas)}
 
         def lookup_schema(name) do
-          # IO.inspect(absinthe_schemas: @absinthe_schemas)
+          #IO.inspect(absinthe_schemas: @absinthe_schemas)
           @absinthe_schemas[name]
         end
       end
@@ -355,7 +355,7 @@ defmodule AbsintheClient do
   def register_graphql_action(env, :def, name, _args, _guards, _body) do
     default_schema = Module.get_attribute(env.module, :absinthe_schema)
 
-    # IO.inspect(attr: Module.get_attribute(env.module, :graphql))
+    #IO.inspect(attr: Module.get_attribute(env.module, :graphql))
 
     case Module.get_attribute(env.module, :graphql) do
       nil ->
