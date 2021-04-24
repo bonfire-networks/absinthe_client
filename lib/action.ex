@@ -86,6 +86,12 @@ defmodule AbsintheClient.Action do
     })
   end
 
+  defp extract_context(%{assigns: assigns} = conn_or_socket) do
+    # include assigns in context
+    Map.merge(assigns, conn_or_socket.private[:absinthe][:context] || %{})
+    # |> IO.inspect
+  end
+
   defp extract_context(conn_or_socket) do
     conn_or_socket.private[:absinthe][:context] || %{}
   end

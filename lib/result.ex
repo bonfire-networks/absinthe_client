@@ -5,6 +5,7 @@ defmodule AbsintheClient.Result do
 
   alias Absinthe.{Blueprint, Phase, Type}
   use Absinthe.Phase
+  alias AbsintheClient.Helpers
 
   @spec run(Blueprint.t() | Phase.Error.t(), Keyword.t()) :: {:ok, map}
   def run(%Blueprint{} = bp, _options \\ []) do
@@ -119,10 +120,10 @@ defmodule AbsintheClient.Result do
     field_data(fields, errors, [{field_name(field.emitter), value} | acc])
   end
 
-  # TODO: would prefer if the names / aliases were already atoms somehow
-  defp field_name(%{alias: nil, name: name}), do: String.to_existing_atom(name)
-  defp field_name(%{alias: name}), do: String.to_existing_atom(name)
-  defp field_name(%{name: name}), do: String.to_existing_atom(name)
+  # TODO: we could use ReCase here to transform camelCase to camel_case before doing transformations
+  defp field_name(%{alias: nil, name: name}), do: Helpers.maybe_str_to_atom(name)
+  defp field_name(%{alias: name}), do: Helpers.maybe_str_to_atom(name)
+  defp field_name(%{name: name}), do: Helpers.maybe_str_to_atom(name)
 
   defp format_error(%Phase.Error{locations: []} = error) do
     error_object = %{message: error.message}
