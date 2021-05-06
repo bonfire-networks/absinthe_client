@@ -11,21 +11,22 @@ defmodule MyApp.Web.WidgetsLive do
   use AbsintheClient, schema: Bonfire.GraphQL.Schema, action: [mode: :internal]
 
   def mount(params, session, socket) do
-    widgets = list_widgets(socket)
+    widgets = awesome_widgets(socket)
     IO.inspect(widgets)
 
     {:ok, socket
     |> assign(
-      widgets: widgets.data
+      widgets: widgets
     )}
   end
 
+  # notice we use snakecase rather than camelcase
   @graphql """
     {
-      widgets
+      awesome_widgets
     }
   """
-  def list_widgets(socket), do: graphql(socket, :list_widgets)
+  def awesome_widgets(socket), do: graphql(socket, :awesome_widgets)
 
 end
 ```
