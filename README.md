@@ -1,6 +1,7 @@
 # AbsintheClient
 
-WIP adaption of Absinthe.Phoenix.Controller to be used with LiveView
+Elixir library to perform server-side queries on a local Absinthe-based GraphQL API.
+WIP adaption of `Absinthe.Phoenix.Controller` to be used with LiveView.
 
 Usage:
 
@@ -26,7 +27,7 @@ defmodule MyApp.Web.WidgetsLive do
       awesome_widgets
     }
   """
-  def awesome_widgets(socket), do: graphql(socket, :awesome_widgets)
+  def awesome_widgets(socket), do: liveql(socket, :awesome_widgets)
 
 end
 ```
