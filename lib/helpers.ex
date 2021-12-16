@@ -1,4 +1,5 @@
 defmodule AbsintheClient.Helpers do
+  require Logger
 
   def assign(%Plug.Conn{} = conn, key, val) do
     conn
@@ -9,6 +10,11 @@ defmodule AbsintheClient.Helpers do
     socket
     |> Phoenix.LiveView.assign(key, val)
     # |> IO.inspect
+  end
+
+  def assign(other, key, val) do
+    Logger.error("AbsintheClient: expected a socket or conn, but got #{inspect other}")
+    other
   end
 
   def error(%Plug.Conn{} = conn, error) do

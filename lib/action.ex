@@ -73,7 +73,7 @@ defmodule AbsintheClient.Action do
     root_value =
       config
       |> Map.get(:root_value, %{})
-      |> Map.merge(conn_or_socket.private[:absinthe][:root_value] || %{})
+      |> Map.merge(conn_or_socket[:private][:absinthe][:root_value] || %{})
 
     context =
       config
@@ -93,7 +93,7 @@ defmodule AbsintheClient.Action do
   end
 
   defp extract_context(conn_or_socket) do
-    conn_or_socket.private[:absinthe][:context] || %{}
+    conn_or_socket[:private][:absinthe][:context] || %{}
   end
 
 
