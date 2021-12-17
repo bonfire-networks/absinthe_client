@@ -63,8 +63,8 @@ defmodule AbsintheClient.Action do
         #IO.inspect(schema: schema)
         execute(conn_or_socket, schema, querying_module, action_name, document, params, config)
 
-      _ ->
-        #IO.inspect(document_and_schema: false)
+      other ->
+        IO.inspect(document_and_schema: other)
         conn_or_socket
     end
   end
@@ -124,14 +124,25 @@ defmodule AbsintheClient.Action do
         |> Map.put(:params, val)
   end
 
-  defp document_key(%{assigns: %{phoenix_action: name}}), do: to_string(name)
-  defp document_key(%{private: %{phoenix_action: name}}), do: to_string(name)
-  defp document_key(%{assigns: %{private: %{phoenix_action: name}}}), do: to_string(name)
-  defp document_key(p) do
-    #IO.inspect(document_key: p)
-     nil
+  def return_or_put(_other, val) do
+    val
   end
-  defp document_key(_), do: nil
+
+  defp document_key(%{assigns: assigns}), do: document_key(assigns)
+  defp document_key(%{private: assigns}), do: document_key(assigns)
+  defp document_key(%{phoenix_action: name}) do
+    document_key(name)
+  end
+  defp document_key(name) when is_atom(name) do
+    to_string(name)
+  end
+  defp document_key(name) when is_binary(name) do
+    name
+  end
+  defp document_key(p) do
+    IO.inspect(document_key_no_match: p)
+    nil
+  end
 
 
   defp document_and_schema(conn_or_socket, document_provider) do

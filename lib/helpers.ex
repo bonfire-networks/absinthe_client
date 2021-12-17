@@ -12,9 +12,17 @@ defmodule AbsintheClient.Helpers do
     # |> IO.inspect
   end
 
+  def assign(map, key, val) when is_map(map) do
+    Map.merge(map, %{key => val})
+  end
+
+  def assign(nil, key, val) do
+    %{key => val}
+  end
+
   def assign(other, key, val) do
-    Logger.error("AbsintheClient: expected a socket or conn, but got #{inspect other}")
-    other
+    Logger.error("AbsintheClient: expected a socket, conn, or map - got #{inspect other}")
+    %{key => val}
   end
 
   def error(%Plug.Conn{} = conn, error) do

@@ -218,6 +218,9 @@ defmodule AbsintheClient do
           %{errors: errors} ->
             IO.inspect(graphql_errors: errors)
             nil
+          other ->
+            IO.inspect(liveql_no_match: other)
+            nil
         end
 
         if data do
