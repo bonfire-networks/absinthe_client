@@ -73,7 +73,7 @@ defmodule AbsintheClient.Action do
     root_value =
       config
       |> Map.get(:root_value, %{})
-      |> Map.merge(conn_or_socket[:private][:absinthe][:root_value] || %{})
+      |> Map.merge(Map.get(conn_or_socket, :private, %{})[:absinthe][:root_value] || %{})
 
     context =
       config
@@ -88,12 +88,12 @@ defmodule AbsintheClient.Action do
 
   defp extract_context(%{assigns: assigns} = conn_or_socket) do
     # include assigns in context
-    Map.merge(assigns, conn_or_socket.private[:absinthe][:context] || %{})
+    Map.merge(assigns, Map.get(conn_or_socket, :private, %{})[:absinthe][:context] || %{})
     # |> IO.inspect
   end
 
   defp extract_context(conn_or_socket) do
-    conn_or_socket[:private][:absinthe][:context] || %{}
+    Map.get(conn_or_socket, :private, %{})[:absinthe][:context] || %{}
   end
 
 
