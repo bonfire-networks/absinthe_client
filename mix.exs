@@ -43,7 +43,7 @@ defmodule AbsintheClient.Mixfile do
   defp deps do
     [
       {:absinthe_plug, "~> 1.5.0"},
-      {:absinthe, "~> 1.6.6"},
+      {:absinthe, "~> 1.7.0"},
       {:decimal, "~> 1.6 or ~> 2.0"},
       {:phoenix, "~> 1.5"},
       {:phoenix_pubsub, "~> 2.0"},
