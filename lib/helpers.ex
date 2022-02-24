@@ -33,13 +33,13 @@ defmodule AbsintheClient.Helpers do
     {:noreply, Phoenix.LiveView.put_flash(socket, :error, error)}
   end
 
-  def maybe_str_to_atom(str) when is_binary(str) do
+  def maybe_to_atom(str) when is_binary(str) do
     try do
       String.to_existing_atom(str)
     rescue
       ArgumentError -> str
     end
   end
-  def maybe_str_to_atom(other), do: other
+  def maybe_to_atom(other), do: other
 
 end

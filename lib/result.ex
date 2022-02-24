@@ -121,9 +121,9 @@ defmodule AbsintheClient.Result do
   end
 
   # TODO: we could use ReCase here to transform camelCase to camel_case before doing transformations
-  defp field_name(%{alias: nil, name: name}), do: Helpers.maybe_str_to_atom(name)
-  defp field_name(%{alias: name}), do: Helpers.maybe_str_to_atom(name)
-  defp field_name(%{name: name}), do: Helpers.maybe_str_to_atom(name)
+  defp field_name(%{alias: nil, name: name}), do: Helpers.maybe_to_atom(name)
+  defp field_name(%{alias: name}), do: Helpers.maybe_to_atom(name)
+  defp field_name(%{name: name}), do: Helpers.maybe_to_atom(name)
 
   defp format_error(%Phase.Error{locations: []} = error) do
     error_object = %{message: error.message}
