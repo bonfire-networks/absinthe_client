@@ -1,7 +1,8 @@
-# AbsintheClient
+# Absinthe Client
 
-Elixir library to perform server-side queries on a local Absinthe-based GraphQL API.
-WIP adaption of `Absinthe.Phoenix.Controller` to be used with LiveView.
+`AbsintheClient` is an Elixir library to perform server-side queries on a local Absinthe-based GraphQL API.
+
+It is a WIP adaption of `Absinthe.Phoenix.Controller` that can be used with LiveView or in any other context.
 
 Usage:
 
