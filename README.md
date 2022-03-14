@@ -10,7 +10,7 @@ Usage:
 defmodule MyApp.Web.WidgetsLive do
   use MyApp.Web, :live_view
 
-  use AbsintheClient, schema: Bonfire.GraphQL.Schema, action: [mode: :internal]
+  use AbsintheClient, schema: Bonfire.API.GraphQL.Schema, action: [mode: :internal]
 
   def mount(params, session, socket) do
     widgets = awesome_widgets(socket)
