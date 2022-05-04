@@ -1,6 +1,6 @@
 defmodule AbsintheClient.ControllerTest do
   use ExUnit.Case, async: true
-  use AbsintheClient.ConnCase
+  use AbsintheClient.ConnCase, async: true
 
   defmodule Schema do
     use Absinthe.Schema
