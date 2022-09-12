@@ -7,36 +7,36 @@ defmodule AbsintheClient.ControllerTest do
 
     query do
       field :string, :string do
-        arg :echo, :string
-        resolve &resolve_echo/3
+        arg(:echo, :string)
+        resolve(&resolve_echo/3)
       end
 
       field :integer, :integer do
-        arg :echo, :integer
-        resolve &resolve_echo/3
+        arg(:echo, :integer)
+        resolve(&resolve_echo/3)
       end
 
       field :list_of_integers, list_of(:integer) do
-        arg :echo, list_of(:integer)
-        resolve &resolve_echo/3
+        arg(:echo, list_of(:integer))
+        resolve(&resolve_echo/3)
       end
 
       field :input_object_with_integers, :deep_integers do
-        arg :echo, :deep_integers_input
-        resolve &resolve_echo/3
+        arg(:echo, :deep_integers_input)
+        resolve(&resolve_echo/3)
       end
     end
 
     object :deep_integers do
-      field :foo, :integer
-      field :bar, :integer
-      field :baz, :integer
+      field(:foo, :integer)
+      field(:bar, :integer)
+      field(:baz, :integer)
     end
 
     input_object :deep_integers_input do
-      field :foo, :integer
-      field :bar, :integer
-      field :baz, :integer
+      field(:foo, :integer)
+      field(:bar, :integer)
+      field(:baz, :integer)
     end
 
     def resolve_echo(_, %{echo: echo}, _) do
@@ -49,8 +49,8 @@ defmodule AbsintheClient.ControllerTest do
 
     query do
       field :string, :string do
-        arg :echo, :string
-        resolve &resolve_echo/3
+        arg(:echo, :string)
+        resolve(&resolve_echo/3)
       end
     end
 
@@ -74,7 +74,8 @@ defmodule AbsintheClient.ControllerTest do
     @graphql {"""
               query ($echo: String) { string(echo: $echo) }
               """, ReverseSchema}
-    def reverse_string(conn_or_socket, %{data: data}), do: json(conn_or_socket, data)
+    def reverse_string(conn_or_socket, %{data: data}),
+      do: json(conn_or_socket, data)
 
     @graphql """
     query ($echo: Int) { integer(echo: $echo) }
@@ -84,17 +85,20 @@ defmodule AbsintheClient.ControllerTest do
     @graphql """
     query ($echo: [Int]) { list_of_integers(echo: $echo) }
     """
-    def list_of_integers(conn_or_socket, %{data: data}), do: json(conn_or_socket, data)
+    def list_of_integers(conn_or_socket, %{data: data}),
+      do: json(conn_or_socket, data)
 
     @graphql """
     query ($echo: DeepIntegersInput) { input_object_with_integers(echo: $echo) }
     """
-    def input_object_with_integers(conn_or_socket, %{data: data}), do: json(conn_or_socket, data)
+    def input_object_with_integers(conn_or_socket, %{data: data}),
+      do: json(conn_or_socket, data)
   end
 
   describe "input" do
     test "string" do
-      assert %{"string" => "one"} == result(Controller, :string, %{"echo" => "one"})
+      assert %{"string" => "one"} ==
+               result(Controller, :string, %{"echo" => "one"})
     end
 
     test "integer" do
@@ -107,7 +111,13 @@ defmodule AbsintheClient.ControllerTest do
     end
 
     test "input object with integers" do
-      assert %{"input_object_with_integers" => %{"foo" => 1, "bar" => 2, "baz" => 3}} ==
+      assert %{
+               "input_object_with_integers" => %{
+                 "foo" => 1,
+                 "bar" => 2,
+                 "baz" => 3
+               }
+             } ==
                result(Controller, :input_object_with_integers, %{
                  "echo" => %{"foo" => "1", "bar" => "2", "baz" => "3"}
                })
@@ -116,7 +126,8 @@ defmodule AbsintheClient.ControllerTest do
 
   describe "using an alternate schema" do
     test "can be defined using a @graphql tuple" do
-      assert %{"string" => "eno"} == result(Controller, :reverse_string, %{"echo" => "one"})
+      assert %{"string" => "eno"} ==
+               result(Controller, :reverse_string, %{"echo" => "one"})
     end
   end
 

@@ -7,6 +7,7 @@ defmodule AbsintheClient.Blueprint do
     blueprint = put_in(blueprint.execution.context, context)
 
     root_value = Map.merge(blueprint.execution.root_value, options[:root_value] || %{})
+
     blueprint = put_in(blueprint.execution.root_value, root_value)
 
     {:ok, blueprint}

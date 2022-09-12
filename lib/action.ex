@@ -11,18 +11,18 @@ defmodule AbsintheClient.Action do
   def run(bp, opts) do
     case internal?(bp, opts) do
       true ->
-        #IO.inspect(internal: true)
+        # IO.inspect(internal: true)
         {:swap, bp, Phase.Document.Result, AbsintheClient.Result}
 
       false ->
-        #IO.inspect(internal: false)
+        # IO.inspect(internal: false)
         {:insert, bp, normal_pipeline(opts)}
     end
   end
 
   # TODO: Refactor
   defp internal?(bp, opts) do
-    #IO.inspect(internal_opts: opts)
+    # IO.inspect(internal_opts: opts)
     opts[:action][:mode] == :internal ||
       with %{flags: flags} <- Blueprint.current_operation(bp) do
         Map.has_key?(flags, {:action, :internal})
@@ -53,15 +53,24 @@ defmodule AbsintheClient.Action do
   # to be used manually (from AbsintheClient.graphql()), can run outside of Plug
   def call(conn_or_socket, querying_module, params, config) do
     document_provider = Module.safe_concat(querying_module, GraphQL)
-    #IO.inspect(document_provider: document_provider)
+    # IO.inspect(document_provider: document_provider)
     config = update_config(conn_or_socket, config)
-    #IO.inspect(config: config)
+    # IO.inspect(config: config)
 
     case document_and_schema(conn_or_socket, document_provider) do
-      {action_name, document, schema} when not is_nil(document) and not is_nil(schema) ->
+      {action_name, document, schema}
+      when not is_nil(document) and not is_nil(schema) ->
         # #IO.inspect(document: document)
-        #IO.inspect(schema: schema)
-        execute(conn_or_socket, schema, querying_module, action_name, document, params, config)
+        # IO.inspect(schema: schema)
+        execute(
+          conn_or_socket,
+          schema,
+          querying_module,
+          action_name,
+          document,
+          params,
+          config
+        )
 
       other ->
         IO.inspect(document_and_schema: other)
@@ -88,7 +97,11 @@ defmodule AbsintheClient.Action do
 
   defp extract_context(%{assigns: assigns} = conn_or_socket) do
     # include assigns in context
-    Map.merge(assigns, Map.get(conn_or_socket, :private, %{})[:absinthe][:context] || %{})
+    Map.merge(
+      assigns,
+      Map.get(conn_or_socket, :private, %{})[:absinthe][:context] || %{}
+    )
+
     # |> IO.inspect
   end
 
@@ -96,20 +109,29 @@ defmodule AbsintheClient.Action do
     Map.get(conn_or_socket, :private, %{})[:absinthe][:context] || %{}
   end
 
-
-  def execute(conn_or_socket, schema, querying_module, _action_name, document, params, config) do
+  def execute(
+        conn_or_socket,
+        schema,
+        querying_module,
+        _action_name,
+        document,
+        params,
+        config
+      ) do
     variables = parse_variables(document, params, schema, querying_module)
     config = Map.put(config, :variables, variables)
 
-    case Absinthe.Pipeline.run(document, pipeline(schema, querying_module, config)) do
-
+    case Absinthe.Pipeline.run(
+           document,
+           pipeline(schema, querying_module, config)
+         ) do
       {:ok, %{result: result}, _phases} ->
         conn_or_socket
         |> Helpers.assign(:absinthe_variables, params)
         |> return_or_put(result)
 
       {:error, msg, _phases} ->
-        #IO.inspect(error: msg)
+        # IO.inspect(error: msg)
         conn_or_socket
         |> Helpers.error(msg)
     end
@@ -121,7 +143,7 @@ defmodule AbsintheClient.Action do
 
   def return_or_put(%Plug.Conn{} = conn, val) do
     conn
-        |> Map.put(:params, val)
+    |> Map.put(:params, val)
   end
 
   def return_or_put(_other, val) do
@@ -130,20 +152,23 @@ defmodule AbsintheClient.Action do
 
   defp document_key(%{assigns: assigns}), do: document_key(assigns)
   defp document_key(%{private: assigns}), do: document_key(assigns)
+
   defp document_key(%{phoenix_action: name}) do
     document_key(name)
   end
+
   defp document_key(name) when is_atom(name) do
     to_string(name)
   end
+
   defp document_key(name) when is_binary(name) do
     name
   end
+
   defp document_key(p) do
     IO.inspect(document_key_no_match: p)
     nil
   end
-
 
   defp document_and_schema(conn_or_socket, document_provider) do
     case document_key(conn_or_socket) do
@@ -153,7 +178,11 @@ defmodule AbsintheClient.Action do
       key ->
         {
           key,
-          Absinthe.Plug.DocumentProvider.Compiled.get(document_provider, key, :compiled),
+          Absinthe.Plug.DocumentProvider.Compiled.get(
+            document_provider,
+            key,
+            :compiled
+          ),
           document_provider.lookup_schema(key)
         }
     end
@@ -170,7 +199,9 @@ defmodule AbsintheClient.Action do
   end
 
   defp do_parse_variables(params, variable_types, schema, querying_module) do
-    for {name, raw_value} <- params, target_type = Map.get(variable_types, name), into: %{} do
+    for {name, raw_value} <- params,
+        target_type = Map.get(variable_types, name),
+        into: %{} do
       {
         name,
         querying_module.cast_param(raw_value, target_type, schema)
@@ -178,13 +209,15 @@ defmodule AbsintheClient.Action do
     end
   end
 
-
   @type_mapping %{
     Absinthe.Blueprint.TypeReference.List => Absinthe.Type.List,
     Absinthe.Blueprint.TypeReference.NonNull => Absinthe.Type.NonNull
   }
 
-  defp type_reference_to_type(%Absinthe.Blueprint.TypeReference.Name{name: name}, schema) do
+  defp type_reference_to_type(
+         %Absinthe.Blueprint.TypeReference.Name{name: name},
+         schema
+       ) do
     Absinthe.Schema.lookup_type(schema, name)
   end
 

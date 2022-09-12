@@ -9,6 +9,7 @@ defmodule AbsintheClient.Helpers do
   def assign(%Phoenix.LiveView.Socket{} = socket, key, val) do
     socket
     |> Phoenix.LiveView.assign(key, val)
+
     # |> IO.inspect
   end
 
@@ -21,7 +22,8 @@ defmodule AbsintheClient.Helpers do
   end
 
   def assign(other, key, val) do
-    Logger.error("AbsintheClient: expected a socket, conn, or map - got #{inspect other}")
+    Logger.error("AbsintheClient: expected a socket, conn, or map - got #{inspect(other)}")
+
     %{key => val}
   end
 
@@ -40,6 +42,6 @@ defmodule AbsintheClient.Helpers do
       ArgumentError -> str
     end
   end
-  def maybe_to_atom(other), do: other
 
+  def maybe_to_atom(other), do: other
 end

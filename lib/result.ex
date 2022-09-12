@@ -48,7 +48,8 @@ defmodule AbsintheClient.Result do
     %{errors: [format_error(error)]}
   end
 
-  defp data(%{errors: [_ | _] = field_errors}, errors), do: {nil, field_errors ++ errors}
+  defp data(%{errors: [_ | _] = field_errors}, errors),
+    do: {nil, field_errors ++ errors}
 
   # Leaf
   defp data(%{value: nil}, errors), do: {nil, errors}

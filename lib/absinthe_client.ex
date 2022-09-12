@@ -194,11 +194,11 @@ defmodule AbsintheClient do
 
       # Trigger the GraphQL query manually
       def graphql(conn_or_socket, name \\ nil, params \\ %{}) do
-
         # need string keys
-        params = for {key, val} <- params, into: %{} do
-                  {to_string(key), val}
-                 end
+        params =
+          for {key, val} <- params, into: %{} do
+            {to_string(key), val}
+          end
 
         unquote(__MODULE__).Action.call(
           AbsintheClient.Helpers.assign(conn_or_socket, :phoenix_action, name),
@@ -210,21 +210,26 @@ defmodule AbsintheClient do
 
       # Trigger meant to be used in LiveView
       def liveql(socket, name \\ nil, params \\ %{}) do
-        data = case graphql(socket, name, params) do
-          %{data: data, errors: errors} ->
-            IO.inspect(partial_graphql_errors: errors)
-            data
-          %{data: data} -> data
-          %{errors: errors} ->
-            IO.inspect(graphql_errors: errors)
-            nil
-          other ->
-            IO.inspect(liveql_no_match: other)
-            nil
-        end
+        data =
+          case graphql(socket, name, params) do
+            %{data: data, errors: errors} ->
+              IO.inspect(partial_graphql_errors: errors)
+              data
+
+            %{data: data} ->
+              data
+
+            %{errors: errors} ->
+              IO.inspect(graphql_errors: errors)
+              nil
+
+            other ->
+              IO.inspect(liveql_no_match: other)
+              nil
+          end
 
         if data do
-          if Enum.count(data)==1 && Map.get(data, name) do
+          if Enum.count(data) == 1 && Map.get(data, name) do
             Map.get(data, name)
           else
             data
@@ -232,18 +237,25 @@ defmodule AbsintheClient do
         end
       end
 
-
       @impl unquote(__MODULE__)
       @spec cast_param(
               value :: any,
               target_type :: Absinthe.Type.t(),
               schema :: Absinthe.Schema.t()
             ) :: any
-      def cast_param(value, %Absinthe.Type.NonNull{of_type: inner_target_type}, schema) do
+      def cast_param(
+            value,
+            %Absinthe.Type.NonNull{of_type: inner_target_type},
+            schema
+          ) do
         cast_param(value, inner_target_type, schema)
       end
 
-      def cast_param(values, %Absinthe.Type.List{of_type: inner_target_type}, schema)
+      def cast_param(
+            values,
+            %Absinthe.Type.List{of_type: inner_target_type},
+            schema
+          )
           when is_list(values) do
         for value <- values do
           cast_param(value, inner_target_type, schema)
@@ -253,7 +265,8 @@ defmodule AbsintheClient do
       def cast_param(value, %Absinthe.Type.InputObject{} = target_type, schema)
           when is_map(value) do
         for {name, field_value} <- value, into: %{} do
-          case Map.values(target_type.fields) |> Enum.find(&(to_string(&1.identifier) == name)) do
+          case Map.values(target_type.fields)
+               |> Enum.find(&(to_string(&1.identifier) == name)) do
             nil ->
               # Pass through value for error reporting by validations
               {name, field_value}
@@ -261,7 +274,11 @@ defmodule AbsintheClient do
             field ->
               {
                 name,
-                cast_param(field_value, Absinthe.Schema.lookup_type(schema, field.type), schema)
+                cast_param(
+                  field_value,
+                  Absinthe.Schema.lookup_type(schema, field.type),
+                  schema
+                )
               }
           end
         end
@@ -302,7 +319,8 @@ defmodule AbsintheClient do
       defoverridable cast_param: 3
 
       @impl unquote(__MODULE__)
-      @spec absinthe_pipeline(schema :: Absinthe.Schema.t(), Keyword.t()) :: Absinthe.Pipeline.t()
+      @spec absinthe_pipeline(schema :: Absinthe.Schema.t(), Keyword.t()) ::
+              Absinthe.Pipeline.t()
       def absinthe_pipeline(schema, opts) do
         unquote(__MODULE__).default_pipeline(schema, opts)
       end
@@ -335,7 +353,7 @@ defmodule AbsintheClient do
 
   defmacro __before_compile__(env) do
     actions = Module.get_attribute(env.module, :graphql_actions)
-    #IO.inspect(actions: actions)
+    # IO.inspect(actions: actions)
     provides = for {name, doc, _} <- actions, do: {name, doc}
     schemas = for {name, _, schema} <- actions, do: {to_string(name), schema}
 
@@ -347,7 +365,7 @@ defmodule AbsintheClient do
         @absinthe_schemas %{unquote_splicing(schemas)}
 
         def lookup_schema(name) do
-          #IO.inspect(absinthe_schemas: @absinthe_schemas)
+          # IO.inspect(absinthe_schemas: @absinthe_schemas)
           @absinthe_schemas[name]
         end
       end
@@ -358,7 +376,7 @@ defmodule AbsintheClient do
   def register_graphql_action(env, :def, name, _args, _guards, _body) do
     default_schema = Module.get_attribute(env.module, :absinthe_schema)
 
-    #IO.inspect(attr: Module.get_attribute(env.module, :graphql))
+    # IO.inspect(attr: Module.get_attribute(env.module, :graphql))
 
     case Module.get_attribute(env.module, :graphql) do
       nil ->
@@ -366,11 +384,21 @@ defmodule AbsintheClient do
 
       {document, schema} ->
         Module.delete_attribute(env.module, :graphql)
-        Module.put_attribute(env.module, :graphql_actions, {name, document, schema})
+
+        Module.put_attribute(
+          env.module,
+          :graphql_actions,
+          {name, document, schema}
+        )
 
       document ->
         Module.delete_attribute(env.module, :graphql)
-        Module.put_attribute(env.module, :graphql_actions, {name, document, default_schema})
+
+        Module.put_attribute(
+          env.module,
+          :graphql_actions,
+          {name, document, default_schema}
+        )
     end
   end
 
@@ -413,5 +441,6 @@ defmodule AbsintheClient do
   Only implement this function if you need to change the pipeline used
   to process documents.
   """
-  @callback absinthe_pipeline(schema :: Absinthe.Schema.t(), Keyword.t()) :: Absinthe.Pipeline.t()
+  @callback absinthe_pipeline(schema :: Absinthe.Schema.t(), Keyword.t()) ::
+              Absinthe.Pipeline.t()
 end
