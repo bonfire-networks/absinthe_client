@@ -48,7 +48,7 @@ defmodule AbsintheClient.Mixfile do
       {:phoenix_html, "~> 3.1", optional: true},
       {:ex_doc, "~> 0.14", only: :dev},
       {:jason, "~> 1.0", only: [:dev, :test]},
-      {:phoenix_live_view, "~> 0.14", optional: true}
+      {:phoenix_live_view, "~> 0.17", optional: true}
     ]
   end
 end
