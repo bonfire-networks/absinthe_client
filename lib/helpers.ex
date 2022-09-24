@@ -8,7 +8,7 @@ defmodule AbsintheClient.Helpers do
 
   def assign(%Phoenix.LiveView.Socket{} = socket, key, val) do
     socket
-    |> Phoenix.LiveView.assign(key, val)
+    |> Phoenix.Component.assign(key, val)
 
     # |> IO.inspect
   end
