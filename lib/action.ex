@@ -73,7 +73,7 @@ defmodule AbsintheClient.Action do
         )
 
       other ->
-        IO.inspect(document_and_schema: other)
+        IO.inspect(no_document_or_schema_provided: other)
         conn_or_socket
     end
   end
