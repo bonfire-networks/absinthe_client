@@ -45,17 +45,15 @@ defmodule AbsintheClient.Action do
   end
 
   @impl Plug
-  def call(conn_or_socket, config) do
+  def call(conn_or_socket, config \\ %{action: %{mode: :internal}}) do
     querying_module = conn_or_socket.private.phoenix_controller
     call(conn_or_socket, querying_module, conn_or_socket.params, config)
   end
 
   # to be used manually (from AbsintheClient.graphql()), can run outside of Plug
-  def call(conn_or_socket, querying_module, params, config) do
+  def call(conn_or_socket, querying_module, params, config \\ %{action: %{mode: :internal}}) do
     document_provider = Module.safe_concat(querying_module, GraphQL)
     # IO.inspect(document_provider: document_provider)
-    config = update_config(conn_or_socket, config)
-    # IO.inspect(config: config)
 
     case document_and_schema(conn_or_socket, document_provider) do
       {action_name, document, schema}
@@ -116,10 +114,12 @@ defmodule AbsintheClient.Action do
         _action_name,
         document,
         params,
-        config
+        config \\ %{action: %{mode: :internal}}
       ) do
     variables = parse_variables(document, params, schema, querying_module)
-    config = Map.put(config, :variables, variables)
+
+    config = update_config(conn_or_socket, config) |> Map.put(:variables, variables)
+    # IO.inspect(config: config)
 
     case Absinthe.Pipeline.run(
            document,
