@@ -126,9 +126,10 @@ defmodule AbsintheClient.Action do
            pipeline(schema, querying_module, config)
          ) do
       {:ok, %{result: result}, _phases} ->
-        conn_or_socket
-        |> Helpers.assign(:absinthe_variables, params)
-        |> return_or_put(result)
+        # conn_or_socket
+        # |> Helpers.assign(:absinthe_variables, params)
+        # |> return_or_put(result)
+        result
 
       {:error, msg, _phases} ->
         # IO.inspect(error: msg)
@@ -137,18 +138,18 @@ defmodule AbsintheClient.Action do
     end
   end
 
-  def return_or_put(%Phoenix.LiveView.Socket{} = socket, val) do
-    val
-  end
+  # def return_or_put(%Phoenix.LiveView.Socket{} = socket, val) do
+  #   val
+  # end
 
-  def return_or_put(%Plug.Conn{} = conn, val) do
-    conn
-    |> Map.put(:params, val)
-  end
+  # def return_or_put(%Plug.Conn{} = conn, val) do
+  #   conn
+  #   |> Map.put(:params, val)
+  # end
 
-  def return_or_put(_other, val) do
-    val
-  end
+  # def return_or_put(_other, val) do
+  #   val
+  # end
 
   defp document_key(%{assigns: assigns}), do: document_key(assigns)
   defp document_key(%{private: assigns}), do: document_key(assigns)
