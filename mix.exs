@@ -43,12 +43,12 @@ defmodule AbsintheClient.Mixfile do
       {:absinthe_plug, "~> 1.5.0"},
       {:absinthe, "~> 1.7.0"},
       {:decimal, "~> 1.6 or ~> 2.0"},
-      {:phoenix, "1.6.0"},
-      {:phoenix_pubsub, "~> 2.0"},
-      {:phoenix_html, "~> 3.1", optional: true},
+      {:phoenix, "1.7.0"},
+      {:phoenix_pubsub, "~> 2.1"},
+      {:phoenix_html, "~> 4.1", optional: true},
       {:ex_doc, "~> 0.14", only: :dev},
       {:jason, "~> 1.0", only: [:dev, :test]},
-      {:phoenix_live_view, "~> 0.18", optional: true}
+      {:phoenix_live_view, "~> 0.20", optional: true}
     ]
   end
 end

@@ -70,28 +70,29 @@ defmodule AbsintheClient.ControllerTest do
     query ($echo: String) { string(echo: $echo) }
     """
     def string(conn_or_socket, %{data: data}), do: json(conn_or_socket, data)
+    def string(conn_or_socket, data), do: json(conn_or_socket, data)
 
     @graphql {"""
               query ($echo: String) { string(echo: $echo) }
               """, ReverseSchema}
-    def reverse_string(conn_or_socket, %{data: data}),
+    def reverse_string(conn_or_socket, data),
       do: json(conn_or_socket, data)
 
     @graphql """
     query ($echo: Int) { integer(echo: $echo) }
     """
-    def integer(conn_or_socket, %{data: data}), do: json(conn_or_socket, data)
+    def integer(conn_or_socket, data), do: json(conn_or_socket, data)
 
     @graphql """
     query ($echo: [Int]) { list_of_integers(echo: $echo) }
     """
-    def list_of_integers(conn_or_socket, %{data: data}),
+    def list_of_integers(conn_or_socket, data),
       do: json(conn_or_socket, data)
 
     @graphql """
     query ($echo: DeepIntegersInput) { input_object_with_integers(echo: $echo) }
     """
-    def input_object_with_integers(conn_or_socket, %{data: data}),
+    def input_object_with_integers(conn_or_socket, data),
       do: json(conn_or_socket, data)
   end
 
